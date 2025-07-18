@@ -7,4 +7,8 @@
         <RootNamespace>Homework_2m_9l</RootNamespace>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Folder Include="Data\" />
+    </ItemGroup>
+
 </Project>
