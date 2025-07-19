@@ -11,11 +11,13 @@ spec:
   - host: {{ .Values.ingress.host }}
     http:
       paths:
-      - path: {{ .Values.ingress.path }}
-        pathType: {{ .Values.ingress.pathType }}
+       {{- range .Values.ingress.paths }}
+      - path: {{ .path }}
+        pathType: {{ .pathType }}
         backend:
           service:
-            name: {{ include "homework-otus-chart.fullname" . }}
+            name: {{ include "homework-otus-chart.fullname" $ }}
             port:
               number: 80
+      {{- end }}
 {{- end }}
