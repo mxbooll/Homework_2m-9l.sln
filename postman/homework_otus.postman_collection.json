@@ -35,9 +35,191 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{healthApi}}",
+							"raw": "{{baseApi}}/health",
 							"host": [
-								"{{healthApi}}"
+								"{{baseApi}}"
+							],
+							"path": [
+								"health"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Create",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.collectionVariables.set(\"createdUserId\", jsonData.userId);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"johndoe\",\r\n  \"firstName\": \"John\",\r\n  \"lastName\": \"Doe\",\r\n  \"email\": \"john.doe@example.com\",\r\n  \"phone\": \"+1234567890\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseApi}}/user",
+							"host": [
+								"{{baseApi}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"has all properties\", function() {\r",
+									"    pm.expect(jsonData).to.have.property('id');\r",
+									"    pm.expect(jsonData).to.have.property('username');\r",
+									"    pm.expect(jsonData).to.have.property('firstName');\r",
+									"    pm.expect(jsonData).to.have.property('lastName');\r",
+									"    pm.expect(jsonData).to.have.property('email');\r",
+									"    pm.expect(jsonData).to.have.property('phone');    \r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseApi}}/user/{{createdUserId}}",
+							"host": [
+								"{{baseApi}}"
+							],
+							"path": [
+								"user",
+								"{{createdUserId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Message is correct\", function () {\r",
+									"    const expectedUserId = pm.variables.get(\"createdUserId\");\r",
+									"    pm.expect(jsonData.message).to.eql(`User ${expectedUserId} updated`);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"id\": \"{{createdUserId}}\",\r\n  \"username\": \"johndoe Update\",\r\n  \"firstName\": \"John\",\r\n  \"lastName\": \"Doe Update\",\r\n  \"email\": \"john.doe@example.com\",\r\n  \"phone\": \"+7234567890\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseApi}}/user/{{createdUserId}}",
+							"host": [
+								"{{baseApi}}"
+							],
+							"path": [
+								"user",
+								"{{createdUserId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Message is correct\", function () {\r",
+									"    const expectedUserId = pm.variables.get(\"createdUserId\");\r",
+									"    pm.expect(jsonData.message).to.eql(`User ${expectedUserId} deleted`);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseApi}}/user/{{createdUserId}}",
+							"host": [
+								"{{baseApi}}"
+							],
+							"path": [
+								"user",
+								"{{createdUserId}}"
 							]
 						}
 					},
@@ -68,8 +250,13 @@
 	],
 	"variable": [
 		{
-			"key": "healthApi",
-			"value": "http://arch.homework:5005/health"
+			"key": "baseApi",
+			"value": "http://arch.homework"
+		},
+		{
+			"key": "createdUserId",
+			"value": "",
+			"type": "string"
 		}
 	]
 }
