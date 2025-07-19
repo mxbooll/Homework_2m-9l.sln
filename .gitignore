@@ -453,5 +453,6 @@ $RECYCLE.BIN/
 !.vscode/launch.json
 !.vscode/extensions.json
 API/appsettings.json
-secrets.yaml
+# Файлдолжен быть игнорирован. Оставлен для учебного проекта, как пример.
+# secrets.yaml
 *.tgz
