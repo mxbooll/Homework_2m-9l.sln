@@ -1,15 +1,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "homework_otus_chart.fullname" . }}
+  name: {{ include "homework-otus-chart.fullname" . }}
   labels:
-    {{- include "homework_otus_chart.labels" . | nindent 4 }}
+    {{- include "homework-otus-chart.labels" . | nindent 4 }}
 spec:
-  type: {{ .Values.service.type }}
-  ports:
-    - port: {{ .Values.service.port }}
-      targetPort: http
-      protocol: TCP
-      name: http
+  type: ClusterIP
   selector:
-    {{- include "homework_otus_chart.selectorLabels" . | nindent 4 }}
+    {{- include "homework-otus-chart.selectorLabels" . | nindent 4 }}
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
