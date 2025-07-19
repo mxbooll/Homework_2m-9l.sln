@@ -4,13 +4,13 @@ WORKDIR /app
 
 COPY . ./
 
-RUN dotnet restore Homework_2m-9l.csproj
+RUN dotnet restore WebApi.csproj
 RUN dotnet publish -c Release -o /out
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
-WORKDIR /app/Homework_2m-9l
+WORKDIR /app/WebApi
 COPY --from=build /out .
 
 ENV ASPNETCORE_URLS=http://+:80
 EXPOSE 80
 
-ENTRYPOINT ["dotnet", "Homework_2m-9l.dll"]
+ENTRYPOINT ["dotnet", "WebApi.dll"]
