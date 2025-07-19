@@ -4,7 +4,7 @@ namespace Homework_2m_9l.Data.Repository.Users;
 
 public interface IUserRepository
 {
-    Task AddAsync(User user);
+    Task<Guid> AddAsync(User user);
     Task<User> GetAsync(Guid userId);
     Task UpdateAsync(User user);
     Task DeleteAsync(Guid userId);

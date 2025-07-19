@@ -16,8 +16,8 @@ public class UserController(IUserRepository userRepository) : ControllerBase
             return BadRequest(ModelState);
         }
         
-        await userRepository.AddAsync(user);
-        return Ok(new {message = "User created"});
+        var createdUserId = await userRepository.AddAsync(user);
+        return Created(string.Empty, new { userId = createdUserId });
     }
 
     [HttpGet("{userId:guid}")]

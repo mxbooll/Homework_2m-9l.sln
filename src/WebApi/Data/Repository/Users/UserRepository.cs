@@ -5,10 +5,11 @@ namespace Homework_2m_9l.Data.Repository.Users;
 
 public class UserRepository(WebServiceDbContext context) : IUserRepository
 {
-    public async Task AddAsync(User user)
+    public async Task<Guid> AddAsync(User user)
     {
-        await context.Users.AddAsync(user);
+        var createdUser = await context.Users.AddAsync(user);
         await context.SaveChangesAsync();
+        return createdUser.Entity.Id;
     }
 
     public async Task<User> GetAsync(Guid userId)
