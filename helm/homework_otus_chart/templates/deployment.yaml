@@ -13,7 +13,17 @@ spec:
     metadata:
       labels:
         {{- include "homework-otus-chart.selectorLabels" . | nindent 8 }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
     spec:
+      {{- if .Values.postgres.enabled }}
+      initContainers:
+      - name: wait-for-postgres
+        image: busybox:1.28
+        command: ['sh', '-c', 
+          'until nc -z postgres-service 5432; do echo "Waiting for PostgreSQL..."; sleep 2; done']
+      {{- end }}
       containers:
       - name: {{ .Chart.Name }}
         image: "{{ .Values.app.image.repository }}:{{ .Values.app.image.tag }}"
@@ -25,15 +35,9 @@ spec:
             name: {{ include "homework-otus-chart.fullname" . }}-config
         env:
         - name: POSTGRES_HOST
-          valueFrom:
-            secretKeyRef:
-              name: {{ include "homework-otus-chart.fullname" . }}-postgres
-              key: postgres-host
+          value: "postgres-service"
         - name: POSTGRES_PORT
-          valueFrom:
-            secretKeyRef:
-              name: {{ include "homework-otus-chart.fullname" . }}-postgres
-              key: postgres-port
+          value: "5432"
         - name: POSTGRES_DB
           valueFrom:
             secretKeyRef:
@@ -49,17 +53,42 @@ spec:
             secretKeyRef:
               name: {{ include "homework-otus-chart.fullname" . }}-postgres
               key: postgres-password
+        - name: ConnectionStrings__PostgresOtusConnection
+          value: "Server=postgres-service:$(POSTGRES_PORT);Database=$(POSTGRES_DB);User Id=$(POSTGRES_USER);Password=$(POSTGRES_PASSWORD);"
+        resources:
+          {{- toYaml .Values.app.resources | nindent 10 }}
         livenessProbe:
           httpGet:
             path: /health
             port: 80
-          initialDelaySeconds: 10
+          initialDelaySeconds: 30
           timeoutSeconds: 5
           periodSeconds: 10
+          failureThreshold: 3
         readinessProbe:
           httpGet:
             path: /health
             port: 80
-          initialDelaySeconds: 10
-          timeoutSeconds: 5
-          periodSeconds: 10
+          initialDelaySeconds: 5
+          timeoutSeconds: 3
+          periodSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 80
+          failureThreshold: 30  # 30 * 1 = 30s max
+          periodSeconds: 1
+      {{- with .Values.app.nodeSelector }}
+        nodeSelector:
+          {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.app.tolerations }}
+        tolerations:
+          {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.app.affinity }}
+        affinity:
+          {{- toYaml . | nindent 8 }}
+      {{- end }}
