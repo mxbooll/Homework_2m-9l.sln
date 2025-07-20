@@ -1,0 +1,16 @@
+1. Проверьте поды:
+   kubectl get pods -l app.kubernetes.io/name={{ .Chart.Name }}
+
+2. Проверьте сервис:
+   kubectl get svc {{ include "homework-otus-chart.fullname" . }}
+
+3. Доступ к приложению:
+   {{- if .Values.ingress.enabled }}
+   http://{{ .Values.ingress.host }}{{ .Values.ingress.path }}
+   {{- else }}
+   kubectl port-forward svc/{{ include "homework-otus-chart.fullname" . }} 8080:80
+   затем откройте http://localhost:8080
+   {{- end }}
+
+4. Логи приложения:
+   kubectl logs -l app.kubernetes.io/name={{ .Chart.Name }}

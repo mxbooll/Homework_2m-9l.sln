@@ -9,6 +9,6 @@ public class HealthController : ControllerBase
     [HttpGet]
     public ActionResult Get()
     {
-        return Ok();
+        return Ok(new { status = "OK" });
     }
 }

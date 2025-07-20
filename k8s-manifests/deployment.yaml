@@ -14,6 +14,7 @@ spec:
     spec:
       containers:
       - name: homework-container
+        imagePullPolicy: Always
         image: mxbooll/homework_2m_9l:latest
         ports:
         - containerPort: 80
@@ -21,7 +22,13 @@ spec:
           httpGet:
             path: /health
             port: 80
+          initialDelaySeconds: 10
+          timeoutSeconds: 5
+          periodSeconds: 10
         readinessProbe:
           httpGet:
             path: /health
             port: 80
+          initialDelaySeconds: 10
+          timeoutSeconds: 5
+          periodSeconds: 10

@@ -1,0 +1,63 @@
+# Общие настройки
+app:
+  name: "homework-service"
+  replicaCount: 2
+  image:
+    repository: "mxbooll/homework_2m_9l"
+    tag: "latest"
+    pullPolicy: "Always"
+
+# Конфигурация приложения
+config:
+  loggingLevel: "Information"
+  aspnetCoreLevel: "Warning"
+  allowedHosts: "*"
+
+# Настройки БД (без пароля)
+postgres:
+  host: "postgres-service"
+  port: "5432"
+  db: "projectotus"
+  user: "postgres"  
+  enabled: true
+  image:
+    repository: postgres
+    tag: "15-alpine"
+  persistence:
+    enabled: true
+    size: 5Gi 
+
+ingress-nginx:
+  enabled: true
+  controller:
+    ingressClassResource:
+      name: nginx
+      enabled: true
+      default: true
+    service:
+      type: NodePort
+    hostPort:
+      enabled: true
+      ports:
+        http: 80
+        https: 443
+
+# Настройки Ingress
+ingress:
+  enabled: true
+  className: "nginx"
+  host: "arch.homework"
+  paths:
+    - path: "/health"
+      pathType: "Exact"
+    - path: "/user"
+      pathType: "Prefix"    
+  pathType: "Exact"
+
+nameOverride: ""
+fullnameOverride: ""  
+
+serviceAccount:
+  create: true
+  name: ""
+  annotations: {}  
