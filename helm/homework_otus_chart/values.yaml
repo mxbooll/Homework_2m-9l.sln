@@ -20,7 +20,12 @@ postgres:
   db: "projectotus"
   user: "postgres"  
   enabled: true
-  storageSize: 5Gi
+  image:
+    repository: postgres
+    tag: "15-alpine"
+  persistence:
+    enabled: true
+    size: 5Gi 
 
 ingress-nginx:
   enabled: true

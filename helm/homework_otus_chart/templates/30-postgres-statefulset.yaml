@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: postgres
-        image: postgres:15-alpine
+        image: "{{ .Values.postgres.image.repository }}:{{ .Values.postgres.image.tag }}"
         env:
         - name: POSTGRES_PASSWORD
           valueFrom:
@@ -57,4 +57,4 @@ spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: 5Gi
+          storage: {{ .Values.postgres.persistence.size | default "5Gi" }}
