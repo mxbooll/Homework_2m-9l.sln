@@ -1,0 +1,68 @@
+apiVersion: 1
+groups:
+    - orgId: 1
+      name: AlertErrorRate
+      folder: AlertFolder
+      interval: 10s
+      rules:
+        - uid: fetczawzpeghsc
+          title: Error Rate 5xx
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 15524
+                to: 15250
+              datasourceUid: prometheus
+              model:
+                adhocFilters: []
+                datasource:
+                    type: prometheus
+                    uid: prometheus
+                editorMode: code
+                expr: sum(rate(custom_request_duration_seconds_count{code=~"5.."}[1m])) by (route)
+                instant: true
+                interval: ""
+                intervalMs: 30000
+                legendFormat: __auto
+                maxDataPoints: 43200
+                range: false
+                refId: A
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 15
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          dashboardUid: 35eff187-f045-4273-aa1b-8586d44ba8b6
+          panelId: 5
+          noDataState: NoData
+          execErrState: Error
+          for: 1m
+          keepFiringFor: 1m
+          annotations:
+            __dashboardUid__: 35eff187-f045-4273-aa1b-8586d44ba8b6
+            __panelId__: "5"
+          labels: {}
+          isPaused: false
+          notification_settings:
+            receiver: grafana-default-email
