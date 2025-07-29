@@ -1,0 +1,21 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "homework-otus-chart.fullname" . }}-monitor
+  namespace: monitoring  # указывать namespace Prometheus
+  labels:
+    app: {{- include "homework-otus-chart.labels" . | nindent 4 }}
+    release: prometheus-stack  # должен совпадать с релизом Prometheus
+spec:
+  endpoints:
+  - port: metrics  # должен совпадать с портом в Service
+    scheme: http
+    path: /metrics
+    honorLabels: true
+    interval: 30s
+  selector:
+    matchLabels:
+      {{- include "homework-otus-chart.selectorLabels" . | nindent 6 }}
+  namespaceSelector:
+    matchNames:
+    - default

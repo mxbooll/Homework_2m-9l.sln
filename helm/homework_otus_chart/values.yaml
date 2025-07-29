@@ -1,4 +1,5 @@
 # Общие настройки
+fullnameOverride: "homework-service"
 app:
   name: "homework-service"
   replicaCount: 2
@@ -41,23 +42,107 @@ ingress-nginx:
       ports:
         http: 80
         https: 443
+    metrics:
+      enabled: true
+      service:
+        type: ClusterIP
+        ports: 
+          metrics: 10254  # Порт для метрик
+        annotations:
+          prometheus.io/scrape: "true"
+          prometheus.io/port: "10254"
+      
+      serviceMonitor:
+        enabled: true
+        namespace: monitoring  # Namespace где установлен Prometheus
+        selector:
+          matchLabels:
+            app.kubernetes.io/name: ingress-nginx
+            app.kubernetes.io/instance: homework-service        
+        interval: 30s
+        scrapeTimeout: 10s
+        port: metrics
+        endpoints:
+        - port: metrics
+          path: /metrics
+          interval: 30s
+          scrapeTimeout: 10s          
+          honorLabels: true
+          scheme: http
+        labels:
+          release: prometheus-stack  # Должен совпадать с релизом Prometheus
+        metricRelabelings:
+        - action: keep
+          regex: 'nginx_ingress_.*'
+          sourceLabels: [__name__]
 
 # Настройки Ingress
 ingress:
   enabled: true
   className: "nginx"
-  host: "arch.homework"
-  paths:
-    - path: "/health"
-      pathType: "Exact"
-    - path: "/user"
-      pathType: "Prefix"    
+#  annotations:
+#    nginx.ingress.kubernetes.io/rewrite-target: /
+#    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  hosts:
+    - host: "arch.homework"
+      paths:
+        - path: /health
+          pathType: Exact
+          backend:
+           service:
+             name: homework-service
+             port: 
+               number: 80
+        - path: /api
+          pathType: Prefix
+          backend:
+           service:
+             name: homework-service
+             port: 
+               number: 80
+        - path: /metrics
+          pathType: Exact
+          backend:
+           service:
+             name: homework-service
+             port: 
+               number: 80
+        - path: /user
+          pathType: Prefix
+          backend:
+           service:
+             name: homework-service
+             port: 
+               number: 80
   pathType: "Exact"
-
+  
 nameOverride: ""
-fullnameOverride: ""  
+# fullnameOverride: ""
 
 serviceAccount:
   create: true
   name: ""
-  annotations: {}  
+  annotations: {}
+
+serviceMonitor:
+  enabled: true
+  namespace: monitoring # Должен совпадать с установленным helm install prometheus-stack ... -n monitoring --create-namespace
+  labels:
+    release: "prometheus-stack"  # Должен совпадать с установленным helm install prometheus-stack 
+  selector:
+    matchLabels:
+      app: "homework-service"
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s
+      scrapeTimeout: 10s  
+
+prometheusOperator:
+  enabled: false
+
+prometheus:
+  enabled: false
+
+grafana:
+  enabled: false
